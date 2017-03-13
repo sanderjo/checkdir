@@ -89,15 +89,15 @@ def isFAT(dir):
         device = ''
         for thisline in os.popen(dfcmd).readlines():
             if thisline.find('/')==0:
-                if debug: print thisline
                 # Starts with /, so a real, local device
+                if debug: print thisline
                 device = thisline.split()[0]
                 mountcmd = "mount | grep " + device
                 mountoutput = os.popen(mountcmd).readline().strip()
                 if debug: print mountoutput
-                if 'msdo' in mountoutput.split('(')[1]:
+                if 'msdos' in mountoutput.split('(')[1]:
                     FAT = True
-                break
+                    break
         
 
     return FAT
