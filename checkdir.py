@@ -66,7 +66,7 @@ def isFAT(dir):
 					# Now check if that drive letter is in the dir to be checked (somewhere in the beginning of the path)
 					# ... because can be '\\?\C:\Media\...'
 					if dir.find(driveletter) >=0 and dir.find(driveletter) <= 5 :
-						FAT = true
+						FAT = True
 						break	# we're done
 				except:
 					continue
