@@ -25,7 +25,7 @@ def isFAT(dir):
 		/dev/sda1      vfat 488263616 163545248 324718368  34% /media/sander/INTENSO
 		'''
 
-		cmd = "df -T " + dir
+		cmd = "df -T " + dir + " 2>&1"
 		for thisline in os.popen(cmd).readlines():
 			#print thisline
 			if thisline.find('/')==0:
@@ -36,7 +36,7 @@ def isFAT(dir):
 					FAT = True
 					if debug: print "FAT found"
 					break
-	elif 'win' in sys.platform:
+	elif 'win32' in sys.platform:
 		dir = dir.upper()	# input could be in lower case like "e:\", so to upper first
 		# On Windows:
 		'''
@@ -71,7 +71,34 @@ def isFAT(dir):
 						break	# we're done
 				except:
 					continue
+	elif 'darwin' in sys.platform:
+		# MacOS formerly known as OSX
+		'''
+		MacOS needs a two-step approach:
 
+		server:~ sander$ df /Volumes/CARTUNES/Tuna/
+		Filesystem   512-blocks      Used Available Capacity iused ifree %iused  Mounted on
+		/dev/disk9s1  120815744 108840000  11975744    91%       0     0  100%   /Volumes/CARTUNES
+
+		server:~ sander$ mount | grep /dev/disk9s1
+		/dev/disk9s1 on /Volumes/CARTUNES (msdos, local, nodev, nosuid, noowners)
+
+		
+		'''
+		dfcmd = "df " + dir
+		device = ''
+		for thisline in os.popen(dfcmd).readlines():
+			if thisline.find('/')==0:
+				if debug: print thisline
+				# Starts with /, so a real, local device
+				device = thisline.split()[0]
+				mountcmd = "mount | grep " + device
+				mountoutput = os.popen(mountcmd).readline().strip()
+				if debug: print mountoutput
+				if 'msdo' in mountoutput.split('(')[1]:
+					FAT = True
+				break
+		
 
 	return FAT
 
@@ -84,4 +111,9 @@ if __name__ == "__main__":
 	except:
 		print "Specify dir on the command line"
 		sys.exit(0)
-	print  "Is", dir, "on FAT? Answer:", isFAT(dir)
+	if isFAT(dir):
+		print dir, "is on FAT"
+	else:
+		print dir, "is not on FAT"
+
+
