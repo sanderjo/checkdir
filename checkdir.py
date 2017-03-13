@@ -37,6 +37,7 @@ def isFAT(dir):
 					if debug: print "FAT found"
 					break
 	elif 'win' in sys.platform:
+		dir = dir.upper()	# input could be in lower case like "e:\", so to upper first
 		# On Windows:
 		'''
 		C:\>wmic logicaldisk get name,filesystem
@@ -59,9 +60,9 @@ def isFAT(dir):
 		for line in subprocess.check_output(windowscmd,creationflags=CREATE_NO_WINDOW).replace('\r','').split('\n'):
 			if 'FAT' in line:
 				# I'm quite sure if 'FAT' is there, there is always a space before the drive letter, 
-				# thus a split() is possible, but to be sure put it in a try/except:
+				# and thus a split() is possible, but to be sure put it in a try/except:
 				try:
-					driveletter = line.split()[1]
+					driveletter = line.split()[-1]
 					# We have found a drive letter which is FAT
 					# Now check if that drive letter is in the dir to be checked (somewhere in the beginning of the path)
 					# ... because can be '\\?\C:\Media\...'
@@ -84,7 +85,3 @@ if __name__ == "__main__":
 		print "Specify dir on the command line"
 		sys.exit(0)
 	print  "Is", dir, "on FAT? Answer:", isFAT(dir)
-
-
-
-
